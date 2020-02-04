@@ -1,0 +1,177 @@
+# -*- coding: utf-8 -*-
+# -------------------------------------------------------------------------
+# This is a sample controller
+# this file is released under public domain and you can use without limitations
+# -------------------------------------------------------------------------
+
+# ---- example index page ----
+@auth.requires_membership('administrador')
+def navegacao():
+    rows = SQLFORM.grid(db.venda)
+    tt = db(db.despesa).select()
+    for i in tt:
+        if i.descricao =="":
+            i.descricao ="DESPESA"
+            i.update_record()
+    return locals()
+@auth.requires_membership('administrador')
+def grade():
+    rows = db(db.auth_user).select()
+    return locals()
+@auth.requires_login()
+def index():
+    a = auth.user
+    rows = db(db.projeto.created_by == auth.user).select()    
+    return locals()
+@auth.requires_membership('administrador')
+def indexnew():
+    a = db.auth_user(request.args(0, auth.user))
+    rows = db(db.projeto.created_by == a).select()
+    return locals()
+
+def venda_vista():
+    projeto = db.projeto(request.args(0, cast=int))
+    subvenda = db(db.sub_venda.projeto==projeto.id).select()
+    classdesp =  db(db.class_desp.projeto==projeto.id).select()
+    listdesp = db(db.despesa.id == 789456).select()
+    rowsv = db(db.venda.id == 789456).select()
+    for f in classdesp:
+        listdesp += db(db.despesa.class_desp == f.id).select()
+    for l in subvenda:
+        rowsv += db(db.venda.sub_venda == l.id).select()
+    #rowsv = db(db.venda.sub_venda == subvenda.id or db.venda.sub_venda == subvenda[0].id).select()
+    rows = db(db.avista.projeto == projeto.id).select(orderby=db.avista.data_venda)
+    return locals()
+@auth.requires_membership('operador')
+def criar_venda():
+    conteudo = db.projeto(request.args(0, auth.user))
+
+    db.avista.projeto.default = conteudo.id
+    db.avista.projeto.writable = False
+    
+    form = SQLFORM(db.avista).process()
+    if form.accepted:
+        response.flash = 'Formulario aceito'
+        redirect(URL('venda_vista', args=conteudo.id))
+    elif form.errors:
+        response.flash = 'Formulario não aceito'
+    else:
+        response.flash = 'Preencha o formulario'
+    return locals()
+@auth.requires_membership('operador')
+def alterar_venda():
+    avista = db.avista(request.args(0, cast=int))
+    projeto = db.projeto(avista.projeto)
+    db.avista.id.readable = False
+    db.avista.id.writable = False
+    
+    db.avista.projeto.readable = False
+    db.avista.projeto.writable = False
+
+    form = SQLFORM(db.avista, request.args(0, cast=int), deletable=True)
+    if form.process().accepted:
+        session.flash = 'Atualizado'
+        redirect(URL('venda_vista', args=projeto.id))
+    elif form.errors:
+        response.flash = 'Erros no formulário!'
+    else:
+        if not response.flash:
+            response.flash = 'Preencha o formulário!'
+    return locals()
+@auth.requires_membership('operador')
+def criar_projeto():
+    conteudo = db.projeto(request.args(0, auth.user))
+
+    form = SQLFORM(db.projeto).process()
+    if form.accepted:
+        response.flash = 'Formulario aceito'
+        redirect(URL('index'))
+    elif form.errors:
+        response.flash = 'Formulario não aceito'
+    else:
+        response.flash = 'Preencha o formulario'
+    return locals()
+@auth.requires_membership('operador')
+def alterar_projeto():
+    projeto = db.projeto(request.args(0, cast=int))
+
+    db.projeto.id.readable = False
+    db.projeto.id.writable = False
+
+    form = SQLFORM(db.projeto, request.args(0, cast=int), deletable=True)
+    if form.process().accepted:
+        session.flash = 'Projeto atualizado'
+        redirect(URL('index', args=projeto.id))
+    elif form.errors:
+        response.flash = 'Erros no formulário!'
+    else:
+        if not response.flash:
+            response.flash = 'Preencha o formulário!'
+    return locals()
+@auth.requires_login()
+def acesso_geral_projeto():
+    projeto = db.projeto(request.args(0, cast=int))
+    lvend = db(db.vendedor.projeto == projeto.id).select(orderby=~db.vendedor.vendapraso)
+    return locals()
+
+@auth.requires_login()
+def relatorio():
+    projeto = db.projeto(request.args(0, cast=int))
+    subvenda = db(db.sub_venda.projeto == projeto.id).select()
+    for a in subvenda:
+        totalvenda = db(db.venda.sub_venda == a.id).select(db.venda.venda_praso.sum()).first()[db.venda.venda_praso.sum()]
+        totalvenda -= db(db.venda.sub_venda == a.id).select(db.venda.valor_devolvido.sum()).first()[db.venda.valor_devolvido.sum()]
+        totalfichas = db(db.venda.sub_venda == a.id).select(db.venda.quant_fichas.sum()).first()[db.venda.quant_fichas.sum()]
+        totalfichas -= db(db.venda.sub_venda == a.id).select(db.venda.quant_fichas_devolvidas.sum()).first()[db.venda.quant_fichas_devolvidas.sum()]
+        a.quant_fichas=totalfichas
+        a.venda_praso=totalvenda
+        a.update_record()
+    return locals()
+
+# ---- API (example) -----
+@auth.requires_login()
+def api_get_user_email():
+    if not request.env.request_method == 'GET': raise HTTP(403)
+    return response.json({'status':'success', 'email':auth.user.email})
+
+# ---- Smart Grid (example) -----
+@auth.requires_membership('admin') # can only be accessed by members of admin groupd
+def grid():
+    response.view = 'generic.html' # use a generic view
+    tablename = request.args(0)
+    if not tablename in db.tables: raise HTTP(403)
+    grid = SQLFORM.smartgrid(db[tablename], args=[tablename], deletable=False, editable=False)
+    return dict(grid=grid)
+
+# ---- Embedded wiki (example) ----
+def wiki():
+    auth.wikimenu() # add the wiki to the menu
+    return auth.wiki() 
+
+# ---- Action for login/register/etc (required for auth) -----
+def user():
+    """
+    exposes:
+    http://..../[app]/default/user/login
+    http://..../[app]/default/user/logout
+    http://..../[app]/default/user/register
+    http://..../[app]/default/user/profile
+    http://..../[app]/default/user/retrieve_password
+    http://..../[app]/default/user/change_password
+    http://..../[app]/default/user/bulk_register
+    use @auth.requires_login()
+        @auth.requires_membership('group name')
+        @auth.requires_permission('read','table name',record_id)
+    to decorate functions that need access control
+    also notice there is http://..../[app]/appadmin/manage/auth to allow administrator to manage users
+    """
+    return dict(form=auth())
+
+# ---- action to server uploaded static content (required) ---
+@cache.action()
+def download():
+    """
+    allows downloading of uploaded files
+    http://..../[app]/default/download/[filename]
+    """
+    return response.download(request, db)

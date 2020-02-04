@@ -1,0 +1,34 @@
+{{extend 'layout.html'}}
+<h1>ACESSO DESPESA</h1>
+<a class="btn btn-secondary btn-success" href="{{=URL('acesso_class_despesa', args=class_desp.projeto)}}">VOLTAR</a>
+<a class="btn btn-secondary btn-success" href="{{=URL('criar_desp', args=class_desp.id)}}">INSERIR DESPESA</a>
+            {{total=0.0}}
+<div class="table-responsive">
+           <table class="table table-striped table-borderless ">
+					<thead>
+					  <tr>
+						<th>DESCRIÇÃO</th>
+						<th>DATA</th>
+                          <th>TOTAL</th>
+					  </tr>
+					</thead>
+					<tbody>
+						{{for row in rows:}}
+					  <tr>
+                          <td><a href="{{=URL('alterar_desp', args=row.id)}}">{{=row.descricao}}</td>
+                         
+						<td> {{=("{}/{}/{}".format(row.data_inicio.day,row.data_inicio.month,row.data_inicio.year))}}</td></a>
+                      <td>R$ {{="{:,}".format(round(row.valor,2)).replace(",",".")}}0</td>
+					  </tr>
+                        {{total+=row.valor}}
+					  {{pass}}
+                         <tr>
+						<th>#</th>
+						<th>#</th>
+                          <th>R$ {{="{:,}".format(round(total,2)).replace(",",".")}}0</th>
+					  </tr>
+					</tbody>
+				  </table>
+</div>
+{{class_desp.total_classe=total}}
+    {{class_desp.update_record()}}

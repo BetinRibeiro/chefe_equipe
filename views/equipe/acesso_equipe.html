@@ -1,0 +1,75 @@
+{{extend 'layout.html'}}
+<h1>ACESSO AS EQUIPES</h1>
+<a class="btn btn-secondary btn-success" href="{{=URL('default','acesso_geral_projeto', args=projeto.id)}}">VOLTAR</a>
+<a class="btn btn-secondary btn-success" href="{{=URL('criar_vendedor', args=projeto.id)}}">INSERIR VENDEDOR</a>
+{{venda=0}}
+{{vista=0}}
+{{comissao=0}}
+{{comissaot=0}}
+{{vale=0}}
+{{caderno=0}}
+{{a=1}}
+{{total_fichas=0}}
+<div class="table-responsive">
+           <table class="table table-striped table-borderless ">
+					<thead>
+					  <tr>
+                          <th>#</th>
+						<th>NOME</th>
+						<th>VENDA</th>
+						<th>COMISSÃO</th>
+						<th>VALE</th>
+                          <th>CADERNO</th>
+                          <th>SALDO</th>
+                            <th>#</th>
+					  </tr>
+					</thead>
+					<tbody>
+						{{for row in rows:}}
+					  <tr>
+                          <td>{{=a}}º</td>
+                          {{a+=1}}
+                        <td><a href="{{=URL('acesso_venda', args=row.id)}}">{{=row.nome_vendedor}}</a></td>
+						<td>R$ {{="{:,}".format(round(row.vendapraso,2)).replace(",",".")}}0</td>
+                           {{comissao=row.vendapraso}}
+                          {{if comissao > 0:}}
+                          {{comissao=row.vendapraso*row.comissao_venda/100}}
+                          
+{{comissaot+=comissao}}
+                          {{pass}}
+						<td>R$ {{="{:,}".format(round(comissao,2)).replace(",",".")}}0</td>
+                        <td>R$ {{="{:,}".format(round(row.vale_saida,2)).replace(",",".")}}0</td>
+                        <td>R$ {{="{:,}".format(round(row.vale_caderno,2)).replace(",",".")}}0</td>
+                          {{saldo=comissao-row.vale_saida-row.vale_caderno}}
+                          {{if saldo > 0:}}
+						<td>R$ {{="{:,}".format(round(saldo,2)).replace(",",".")}}0</td>
+                          <td><a href="{{=URL('alterar_vendedor', args=row.id)}}">Alterar</a></td>
+                          {{else:}}
+                          
+                          <th width=150 bgcolor=#F63030><a>R$ {{="{:,}".format(round(saldo,2)).replace(",",".")}}0</a></th>
+                          <td><a href="{{=URL('alterar_vendedor', args=row.id)}}">Alterar</a></td>
+                          {{pass}}
+					  </tr>
+                        {{vista+=row.vendavista}}
+                        {{venda+=row.vendapraso}}
+                        {{comissao+=comissao}}
+                        {{vale+=row.vale_saida}}
+                        {{caderno+=row.vale_caderno}}
+                        {{total_fichas+=row.quant_fichas}}
+					  {{pass}}
+                         <tr>
+						<th>#</th>
+                             <th></th>
+						<th>R$ {{="{:,}".format(round(venda,2)).replace(",",".")}}0</th>
+						<th>R$ {{="{:,}".format(round(comissaot,2)).replace(",",".")}}0</th>
+						<th>R$ {{="{:,}".format(round(vale,2)).replace(",",".")}}0</th>
+                          <th>R$ {{="{:,}".format(round(caderno,2)).replace(",",".")}}0</th>
+                          <th></th><th>#</th>
+					  </tr>
+					</tbody>
+				  </table>
+</div>
+{{projeto.total_quant_fichas=total_fichas}}
+{{projeto.total_vale_caderno_vendedor=caderno}}
+{{projeto.total_venda_praso=venda}}
+{{projeto.update_record()}}

@@ -1,0 +1,33 @@
+{{extend 'layout.html'}}
+<h1>ACESSO PARTIÇÃO VENDA</h1>
+
+<a class="btn btn-secondary btn-success" href="{{=URL('acesso_equipe', args=projeto.id)}}">VOLTAR</a>
+<a class="btn btn-secondary btn-success" href="{{=URL('criar_particao', args=projeto.id)}}">CRIAR PARTIÇÃO</a>
+            <br>{{for row in rows:}} {{pass}}
+<div class="table-responsive">
+           <table class="table table-striped table-borderless ">
+					<thead>
+					  <tr>
+						<th>DATA</th>
+						<th>DESCRICAO</th>
+						<th>FICHAS</th>
+						<th>ENTRADAS</th>
+                          <th>V.VISTA</th>
+                           <th>V.PRAZO</th>
+					  </tr>
+					</thead>
+					<tbody>
+						{{for row in rows:}}
+					  <tr>
+                          <td><a href="{{=URL('acesso_particao', args=row.id)}}">{{=row.data_inicio}}</a></td>
+						<td>{{=row.descricao}}</td>
+						<td>{{=row.quant_fichas}}0</td>
+                          <td>R$ {{=row.entradas_venda}}0</td>
+                          <td>{{=row.venda_vista}}0</td>
+                          <td>R$ {{=row.venda_praso}}0</td>
+						<td><a href="{{=URL('alterar_particao', args=row.id)}}">Alterar</a></td>
+					  </tr>
+					  {{pass}}
+					</tbody>
+				  </table>
+</div>

@@ -1,0 +1,38 @@
+{{extend 'layout.html'}}
+{{block header}}
+<center style="background-color: #333; color:white; padding:30px">
+    <h1>SISTEMA DE CONTROLE</h1>
+</center>
+{{end}}
+<center><img src="https://seeklogo.com/images/G/grupo-hinode-logo-5B43C1F538-seeklogo.com.png" class="img-fluid"></center>
+<hr>
+<h3>LISTA DE PROJETOS DE VENDA</h3>
+<a class="btn btn-secondary btn-success" href="{{=URL('criar_projeto')}}">CRIAR PROJETO</a>
+            <br>{{for row in rows:}} {{pass}}
+<div class="table-responsive">
+           <table class="table table-striped table-borderless ">
+					<thead>
+					  <tr>
+						<th>DESCRIÇÃO</th>
+						<th>CHEFE</th>
+						<th>CIDADE</th>
+						<th>VENDA</th>
+						<th>DATA COBRANÇA</th>
+                          <th>#</th>
+					  </tr>
+					</thead>
+					<tbody>
+						{{for row in rows:}}
+					  <tr>
+
+						<td><a href="{{=URL('acesso_geral_projeto', args=row.id)}}">{{=row.descricao}}</a></td>
+						<td>{{=row.nome_chefe}}</td>
+						<td>{{=row.primeira_cidade}}</td>
+						<td>R$ {{="{:,}".format(round(row.total_venda_praso,2)).replace(",",".")}}0</td>
+                          <td>{{=("{}/{}/{}".format(row.data_cobranca.day,row.data_cobranca.month,row.data_cobranca.year))}}</td>
+						<td><a href="{{=URL('alterar_projeto', args=row.id)}}">Alterar</a></td>
+					  </tr>
+					  {{pass}}
+					</tbody>
+				  </table>
+</div>

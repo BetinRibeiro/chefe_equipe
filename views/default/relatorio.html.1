@@ -1,0 +1,51 @@
+{{extend 'layout.html'}}
+<a class="btn btn-secondary btn-success" href="{{=URL('default','acesso_geral_projeto', args=projeto.id)}}">VOLTAR</a>
+ <div class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+              
+<h1>RELATÓRIO</h1>
+<p>
+    DESCRIÇÃO PARA CONTROLE
+</p>
+<hr>
+ <ul class="list-group">
+              <li class="list-group-item active">MERCADORIA E VENDAS</li>
+     <li class="list-group-item">MERCADORIA <b>- R$ {{="{:,}".format(round(projeto.total_preco_mercadoria,2)).replace(",",".")}}0</b><br>
+     QUANTIDADE DE PEÇAS - <b>{{=projeto.total_pecas_mercadoria}}</b> 
+     </li>
+     <li class="list-group-item">VENDA<b>- R$ {{="{:,}".format(round(projeto.total_venda_praso,2)).replace(",",".")}}0</b><br>
+     QUANTIDADE DE FICHAS - <b>{{=projeto.total_quant_fichas}}</b> </li>
+             
+            </ul>
+<br>{{total=0}}
+ <ul class="list-group">
+              <li class="list-group-item active">ENTRADA DE DINHEIRO</li>
+              <li class="list-group-item">ADIANTAMENTO - R$ {{="{:,}".format(round(projeto.dinheiro_adiantado,2)).replace(",",".")}}0</li>
+     <li class="list-group-item">À VISTA- R$ {{="{:,}".format(round(projeto.total_venda_vista,2)).replace(",",".")}}0</li>
+     {{total=projeto.dinheiro_adiantado+projeto.total_venda_vista}}
+     <li class="list-group-item list-group-item-info">TOTAL DINHEIRO <b>- R$ {{="{:,}".format(round(total,2)).replace(",",".")}}0</b></li>
+            </ul>
+<br>
+
+ <ul class="list-group">
+              <li class="list-group-item active">SAIDA DE DINHEIRO</li>
+     <li class="list-group-item">DESPESAS - R$ {{="{:,}".format(round(projeto.total_despesa,2)).replace(",",".")}}0</li>
+              <li class="list-group-item">CAD. VENDEDOR - R$ {{="{:,}".format(round(projeto.total_vale_caderno_vendedor,2)).replace(",",".")}}0</li>
+              <li class="list-group-item">CAD. FUNCIONARIO - R$ {{="{:,}".format(round(projeto.total_vale_caderno_funcionario,2)).replace(",",".")}}0</li>
+     {{totald=projeto.total_despesa+projeto.total_vale_caderno_vendedor+projeto.total_vale_caderno_funcionario}}
+     <li class="list-group-item info">TOTAL DESPESAS <b>- R$ {{="{:,}".format(round(totald,2)).replace(",",".")}}0</b></li>
+            </ul>
+              <br>
+              <ul class="list-group">
+              <li class="list-group-item active">DINHEIRO EM CAIXA</li>
+                  {{caixa=total-totald}}
+     <li class="list-group-item">CAIXA - R$ {{="{:,}".format(round(caixa,2)).replace(",",".")}}0</li>
+            </ul>
+
+</div>
+          <div class="col-md-6"></div>
+        </div>
+      </div>
+    </div>

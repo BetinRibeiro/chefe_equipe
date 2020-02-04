@@ -1,0 +1,23 @@
+{{extend 'layout.html'}}
+<h1>Este é o template default/grade.html</h1>
+<div class="table-responsive">
+           <table class="table table-striped table-borderless ">
+					<thead>
+					  <tr>
+						<th>NOME</th>
+                          <th>#</th>
+                          <th>EMAIL</th>
+					  </tr>
+					</thead>
+					<tbody>
+						{{for row in rows:}}
+					  <tr>
+
+						<td><a href="{{=URL('indexnew', args=row.id)}}">{{=row.first_name}}</a></td>
+                          <td>{{=row.last_name}}</td>
+                           <td>{{=row.email}}</td>
+					  </tr>
+					  {{pass}}
+					</tbody>
+				  </table>
+</div>

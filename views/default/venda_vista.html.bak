@@ -1,0 +1,131 @@
+{{extend 'layout.html'}}
+
+<h1>ACESSO VENDAS</h1>
+<a class="btn btn-secondary btn-success" href="{{=URL('acesso_geral_projeto', args=projeto.id)}}">VOLTAR</a>
+<a class="btn btn-secondary btn-success" href="{{=URL('criar_venda', args=projeto.id)}}">INSERIR VENDA À VISTA</a>
+            {{total=0.0}}
+{{totalp=0}}
+{{lista=[]}}
+{{listadata=[]}}
+{{tfichas=0}}
+{{a=1}}
+{{totald=0}}
+  {{totaldesp=0}}
+{{dia=0}}
+{{dataanterior=(2008, 1, 1)}}
+<div class="table-responsive">
+           <table class="table table-striped table-borderless ">
+					<thead>
+					  <tr>
+                          <th>#</th>
+						<th>CIDADE</th>
+						<th>DATA</th>
+                          <th>Á VISTA</th>
+                           <th>À PRAZO</th>
+                          <th>FICHAS</th>
+                          <th>DEVOLUÇÃO</th>
+                          <th>DESPESA</th>
+					  </tr>
+					</thead>
+					<tbody>
+                      
+                         {{vendapraso=0}}
+                          {{despesa=0}}
+                             {{devolucao=0}}
+                        {{for row in rows:}}
+                         {{despesa=0}}
+                        
+                        {{for row7 in listdesp:}}
+                        {{if row7.data_inicio == row.data_venda:}}
+                        {{despesa+=row7.valor}}
+                        {{row7.valor=0}}
+                        {{pass}}
+                        {{pass}}
+						
+					  <tr>
+                            {{if row.data_venda!=dataanterior:}}
+                          {{dataanterior=row.data_venda}}
+                            {{dia+=1}}
+                          
+                          {{pass}}
+                          {{if row.valor!=0:}}
+                          
+                          <td>{{=dia}}</td>
+                          {{else:}}
+                          {{dia-=1}}
+                          <td>Nada</td>
+                        {{pass}}
+                          {{if row.cidade=="":}}
+                          {{row.cidade="SÓ DESPESA!!"}}
+                          
+                          <td><a class="text-danger" href="{{=URL('alterar_venda', args=row.id)}}"># {{=row.cidade}}</a></td>
+                          {{else:}}
+                          <td><a href="{{=URL('alterar_venda', args=row.id)}}"># {{=row.cidade}}</a></td>
+                          {{pass}}
+                          {{vendapraso=0}}
+                          {{fichas=0}}
+                          {{v=0}}
+                             {{devolucao=0}}
+                          {{for row1 in rowsv:}}
+                          {{if row1.data_venda == row.data_venda:}}
+                          {{vendapraso+=row1.venda_praso-row1.valor_devolvido}}
+                          {{v+=row1.venda_praso}}
+                           {{fichas+=row1.quant_fichas-row1.quant_fichas_devolvidas}}
+                          {{row1.quant_fichas=0}}
+                           {{row1.quant_fichas_devolvidas=0}}
+                          {{devolucao+=row1.valor_devolvido}}
+                           {{row1.venda_praso=0}}
+                           {{row1.valor_devolvido=0}}
+                          {{pass}}
+                          {{pass}}
+                         
+						<td> {{=("{}/{}/{}".format(row.data_venda.day,row.data_venda.month,row.data_venda.year))}}</td>
+                        
+                          {{listadata+=[a]}}
+                          {{a+=1}}
+                      <td>R$ {{="{:,}".format(round(row.valor,2)).replace(",",".")}}0</td>
+                           <td>R$ {{="{:,}".format(round(vendapraso,2)).replace(",",".")}}0</td>
+                          <td> {{=fichas}}</td>
+                          {{tfichas+=fichas}}
+                           {{lista+=[vendapraso]}}
+                           <td>R$ {{="{:,}".format(round(devolucao,2)).replace(",",".")}}0</td>
+                          <td>R$ {{="{:,}".format(round(despesa,2)).replace(",",".")}}0</td>
+					  </tr>
+                        {{totaldesp+=despesa}}
+                        {{total+=row.valor}}
+                        {{totalp+=vendapraso}}
+                        {{totald+=devolucao}}
+					  {{pass}}
+                         <tr>
+                             <th></th>
+						<th>#</th>
+						<th>#</th>
+                          <th>R$ {{="{:,}".format(round(total,2)).replace(",",".")}}0</th>
+                             <th>R$ {{="{:,}".format(round(totalp,2)).replace(",",".")}}0</th><th>#</th>
+                             <th>R$ {{="{:,}".format(round(totald,2)).replace(",",".")}}0</th>
+                             <th>#</th>
+					  </tr>
+					</tbody>
+				  </table>
+</div><div class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+ <ul class="list-group">
+     {{if dia>0:}}
+              <li class="list-group-item active">MÉDIAS&nbsp; </li>
+              <li class="list-group-item">MÉDIA DE <b> R$ {{="{:,}".format(round(total/dia)).replace(",",".")}}0</b> DE VENDA À VISTA POR DIA</li>
+              <li class="list-group-item">MÉDIA DE <b> R$ {{="{:,}".format(round(totalp/dia)).replace(",",".")}}0</b> DE VENDA A PRAZO POR DIA</li>
+              <li class="list-group-item">MÉDIA DE <b>{{=tfichas/dia}}</b> FICHAS POR DIA</li>
+              <li class="list-group-item">MÉDIA DE <b> R$ {{="{:,}".format(round(totald/dia)).replace(",",".")}}0</b> DEVOLVIDO POR DIA</li>
+              <li class="list-group-item">MÉDIA GASTOS DE <b> R$ {{="{:,}".format(round(projeto.total_despesa/dia)).replace(",",".")}}0</b> POR DIA</li>
+     {{pass}}
+            </ul>
+</div>
+          <div class="col-md-6"></div>
+        </div>
+      </div>
+    </div>
+
+{{projeto.total_venda_vista=total}}
+    {{projeto.update_record()}}

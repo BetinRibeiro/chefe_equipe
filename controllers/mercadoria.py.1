@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+# tente algo como
+def acesso_carrada():
+    projeto = db.projeto(request.args(0, cast=int))
+    rows = db(db.carrada.projeto == request.args(0, cast=int)).select()
+    return locals()
+
+def criar_carrada():
+    projeto = db.projeto(request.args(0, auth.user))
+
+    form = SQLFORM(db.carrada).process()
+    if form.accepted:
+        response.flash = 'Formulario aceito'
+        redirect(URL('acesso_carrada', args=projeto.id))
+    elif form.errors:
+        response.flash = 'Formulario não aceito'
+    else:
+        response.flash = 'Preencha o formulario'
+    return locals()
+def alterar_carrada():
+    projeto = db.projeto(request.args(0, cast=int))
+
+    db.carrada.id.readable = False
+    db.carrada.id.writable = False
+
+    form = SQLFORM(db.carrada, request.args(0, cast=int))
+    if form.process().accepted:
+        session.flash = 'Carrada atualizado'
+        redirect(URL('acesso_carrada', args=projeto.id))
+    elif form.errors:
+        response.flash = 'Erros no formulário!'
+    else:
+        if not response.flash:
+            response.flash = 'Preencha o formulário!'
+    return locals()
