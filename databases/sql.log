@@ -250,3 +250,11 @@ success!
 timestamp: 2020-02-02T15:52:08.714067
 ALTER TABLE "projeto" ADD "descricao_vale" TEXT;
 success!
+timestamp: 2020-02-13T18:43:07.391171
+ALTER TABLE "carrada" ADD "total_custo" DOUBLE NOT NULL DEFAULT 0.0;
+timestamp: 2020-02-13T18:43:07.446792
+ALTER TABLE "carrada" ADD "cidade" CHAR(512) NOT NULL DEFAULT 'padão';
+success!
+timestamp: 2020-02-13T18:44:32.824488
+ALTER TABLE "sub_venda" ADD "data_cob" DATE;
+success!
